@@ -38,22 +38,26 @@ def search_youtube_music(song_name):
         return f"https://www.youtube.com/watch?v={video_id}"
     return None
 
+cookies_path = os.getenv("COOKIES_PATH")
+
 # Функція для завантаження музики
 def download_youtube_audio(url, song_name):
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': f'{DOWNLOAD_PATH}%(title)s.%(ext)s',
+        'outtmpl': 'downloads/%(title)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '320',
-        }]
+        }],
+        'cookiefile': cookies_path  # Uses the path from .env
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
         filename = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
         return filename
+
 
 # Видаляє всі старі файли перед новим запитом
 def clear_download_folder():
