@@ -1,15 +1,31 @@
-import os
+import os, requests
 import telebot
 from dotenv import load_dotenv
 import yt_dlp
 from ytmusicapi import YTMusic
 import threading
 import shutil  # Додано для очищення папки
+from flask import Flask, request
 
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
+
+app = Flask(__name__)
+
+
+@app.route('/' + TOKEN, methods=['POST'])
+def get_message():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+@app.route('/')
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url='https://tele-check.onrender.com/' + TOKEN)  # Replace with your Render app name!
+    return "Webhook set!", 200
+
 
 ytmusic = YTMusic()
 DOWNLOAD_PATH = "downloads/"  # Папка для збереження пісень
@@ -97,4 +113,6 @@ def process_song_list(song_names, chat_id):
     else:
         bot.send_message(chat_id, "❌ Жодна пісня не була успішно завантажена.")
 
-bot.polling()
+if __name__ == "__main__":
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=5000)
