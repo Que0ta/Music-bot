@@ -1,0 +1,8 @@
+pyTelegramBotAPI
+python-dotenv
+requests
+Flask
+gunicorn
+waitress
+yt-dlp
+ytmusicapi
