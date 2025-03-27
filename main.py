@@ -104,7 +104,7 @@ def process_song_list(song_names, chat_id):
         video_url = search_youtube_music(song_name)
         if video_url:
             bot.send_message(chat_id, f"📥 {index}/{total_songs} Завантажую: {song_name}...")
-            file_path = download_youtube_audio(video_url, song_name)
+            file_path = download_youtube_audio(video_url, song_name, chat_id)
 
             if os.path.exists(file_path):
                 downloaded_files.append(file_path)
