@@ -41,7 +41,7 @@ def search_youtube_music(song_name):
 cookies_path = os.getenv("COOKIES_PATH")
 
 # Функція для завантаження музики
-def download_youtube_audio(url, song_name):
+def download_youtube_audio(url, song_name, chat_id):
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': 'downloads/%(title)s.%(ext)s',
@@ -53,10 +53,17 @@ def download_youtube_audio(url, song_name):
         'cookiefile': cookies_path  # Uses the path from .env
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
-        return filename
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            filename = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
+            return filename
+    except yt_dlp.utils.DownloadError as e:
+        bot.send_message(chat_id, f"❌ Помилка при завантаженні '{song_name}': {str(e)}")
+    except Exception as e:
+        bot.send_message(chat_id, f"⚠️ Невідома помилка для '{song_name}': {str(e)}")
+    return None  # Return None if an error occurs
+
 
 
 # Видаляє всі старі файли перед новим запитом
